@@ -1,0 +1,50 @@
+import { PayPalScriptProvider, PayPalButtons } from '@paypal/react-paypal-js';
+
+const PayPalButton = ({ amount }: { amount: number }) => {
+  
+  const orderAmount = amount.toString(); // This is the amount we want to pay
+  const clientId = process.env.NODE_ENV; // This is paypal Client Id
+
+  // Define your PayPal options
+  const options = {
+    clientId: clientId,
+    currency: 'EUR',
+  };
+
+  // Define your order details
+  const createOrder = (data: any, actions: any) => {
+    return actions.order.create({
+      purchase_units: [
+        {
+          amount: {
+            value: orderAmount, // Replace with the amount you want to charge
+          },
+        },
+      ],
+    });
+  };
+
+  // Define the onApprove function
+  const onApprove = (data: any, actions: any) => {
+    return actions.order.capture().then(function (details: any) {
+      // Handle a successful payment here
+      console.log('Transaction completed by ' + details.payer.name.given_name);
+    });
+  };
+
+  return (
+    <>
+      <PayPalScriptProvider options={options}>
+        <PayPalButtons createOrder={createOrder} onApprove={onApprove} />
+      </PayPalScriptProvider>
+    </>
+  );
+};
+
+export default PayPalButton;
+
+
+
+---------- How to call in react component ---------------------
+
+<PayPalButton amount={100}/>
